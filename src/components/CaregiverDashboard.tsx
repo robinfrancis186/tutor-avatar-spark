@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,8 +27,8 @@ export const CaregiverDashboard = () => {
     { day: "Thu", lessons: 1, engagement: 88, mood: "Focused" },
     { day: "Fri", lessons: 1, engagement: 83, mood: "Happy" },
     { day: "Sat", lessons: 0, engagement: 0, mood: "Rest Day" },
-    { day: "Sun", lessons: 0, engagement: 0, mood: "Rest Day" }
-  ];
+    { day: "Sun", lessons: 0, engagement: 0, mood: "Rest Day" },
+  ]);
 
   const { toast } = useToast();
 
