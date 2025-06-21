@@ -5,6 +5,11 @@ import { SubjectGrid } from '@/components/SubjectGrid';
 import { ProgressDashboard } from '@/components/ProgressDashboard';
 import { TutorChat } from '@/components/TutorChat';
 import { AchievementBadges } from '@/components/AchievementBadges';
+import { AccessibilitySettings } from '@/components/AccessibilitySettings';
+import { CaregiverDashboard } from '@/components/CaregiverDashboard';
+import { AdaptiveLearningEngine } from '@/components/AdaptiveLearningEngine';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -22,9 +27,38 @@ const Index = () => {
         
         {activeSection === 'dashboard' && (
           <div className="space-y-8 animate-fade-in">
-            <ProgressDashboard />
-            <SubjectGrid onSubjectSelect={handleSubjectSelect} />
-            <AchievementBadges />
+            <Tabs defaultValue="learning" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="learning">Learning</TabsTrigger>
+                <TabsTrigger value="progress">Progress</TabsTrigger>
+                <TabsTrigger value="adaptive">AI Engine</TabsTrigger>
+                <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
+                <TabsTrigger value="caregiver">Caregiver</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="learning" className="space-y-8 mt-6">
+                <ProgressDashboard />
+                <SubjectGrid onSubjectSelect={handleSubjectSelect} />
+                <AchievementBadges />
+              </TabsContent>
+              
+              <TabsContent value="progress" className="space-y-8 mt-6">
+                <ProgressDashboard />
+                <AchievementBadges />
+              </TabsContent>
+              
+              <TabsContent value="adaptive" className="space-y-8 mt-6">
+                <AdaptiveLearningEngine />
+              </TabsContent>
+              
+              <TabsContent value="accessibility" className="space-y-8 mt-6">
+                <AccessibilitySettings />
+              </TabsContent>
+              
+              <TabsContent value="caregiver" className="space-y-8 mt-6">
+                <CaregiverDashboard />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
 

@@ -112,7 +112,8 @@ export const AchievementBadges = () => {
     setAchievements(prev => 
       prev.map(achievement => {
         if (!achievement.earned && Math.random() > 0.5) {
-          const [current, total] = achievement.progress.split('/').map(Number);
+          const unearnedAchievement = achievement as UnearnedAchievement;
+          const [current, total] = unearnedAchievement.progress.split('/').map(Number);
           const newCurrent = Math.min(total, current + 1);
           const newProgress = `${newCurrent}/${total}`;
           
@@ -124,7 +125,7 @@ export const AchievementBadges = () => {
           }
           
           return { 
-            ...achievement, 
+            ...unearnedAchievement, 
             progress: newProgress 
           } as UnearnedAchievement;
         }
@@ -268,13 +269,13 @@ export const AchievementBadges = () => {
                   ) : (
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500">
-                        Progress: {achievement.progress}
+                        Progress: {(achievement as UnearnedAchievement).progress}
                       </p>
                       <div className="w-full bg-gray-200 rounded-full h-1.5">
                         <div 
                           className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" 
                           style={{
-                            width: `${(parseInt(achievement.progress.split('/')[0]) / parseInt(achievement.progress.split('/')[1])) * 100}%`
+                            width: `${(parseInt((achievement as UnearnedAchievement).progress.split('/')[0]) / parseInt((achievement as UnearnedAchievement).progress.split('/')[1])) * 100}%`
                           }}
                         ></div>
                       </div>
