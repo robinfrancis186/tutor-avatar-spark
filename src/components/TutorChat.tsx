@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { user, message-circle } from 'lucide-react';
+import { User, MessageCircle } from 'lucide-react';
 
 interface TutorChatProps {
   subject: string;
@@ -68,7 +68,7 @@ export const TutorChat = ({ subject, onBack }: TutorChatProps) => {
         <Card className="lg:col-span-2 border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
             <CardTitle className="flex items-center gap-2">
-              <user className="w-5 h-5" />
+              <User className="w-5 h-5" />
               Your Personal Tutor
             </CardTitle>
           </CardHeader>
@@ -115,7 +115,7 @@ export const TutorChat = ({ subject, onBack }: TutorChatProps) => {
                   className="flex-1"
                 />
                 <Button onClick={handleSendMessage}>
-                  <message-circle className="w-4 h-4" />
+                  <MessageCircle className="w-4 h-4" />
                 </Button>
               </div>
             </div>
