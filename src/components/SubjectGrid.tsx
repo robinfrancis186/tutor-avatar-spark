@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { book, gamepad, star } from 'lucide-react';
+import { Book, Gamepad, Star } from 'lucide-react';
 
 interface SubjectGridProps {
   onSubjectSelect: (subject: string) => void;
@@ -12,7 +12,7 @@ export const SubjectGrid = ({ onSubjectSelect }: SubjectGridProps) => {
     {
       id: 'math',
       name: 'Mathematics',
-      icon: star,
+      icon: Star,
       color: 'from-green-400 to-emerald-500',
       description: 'Numbers, patterns, and problem solving',
       level: 'Beginner'
@@ -20,7 +20,7 @@ export const SubjectGrid = ({ onSubjectSelect }: SubjectGridProps) => {
     {
       id: 'reading',
       name: 'Reading',
-      icon: book,
+      icon: Book,
       color: 'from-blue-400 to-cyan-500',
       description: 'Stories, comprehension, and vocabulary',
       level: 'Intermediate'
@@ -28,7 +28,7 @@ export const SubjectGrid = ({ onSubjectSelect }: SubjectGridProps) => {
     {
       id: 'science',
       name: 'Science',
-      icon: star,
+      icon: Star,
       color: 'from-purple-400 to-pink-500',
       description: 'Explore the world around us',
       level: 'Beginner'
@@ -36,7 +36,7 @@ export const SubjectGrid = ({ onSubjectSelect }: SubjectGridProps) => {
     {
       id: 'games',
       name: 'Learning Games',
-      icon: gamepad,
+      icon: Gamepad,
       color: 'from-orange-400 to-red-500',
       description: 'Fun activities and challenges',
       level: 'All Levels'

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 export const AchievementBadges = () => {
   const achievements = [
@@ -43,7 +43,7 @@ export const AchievementBadges = () => {
     <Card className="border-0 shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl text-gray-800">
-          <star className="w-6 h-6 text-yellow-500" />
+          <Star className="w-6 h-6 text-yellow-500" />
           Your Achievements
         </CardTitle>
       </CardHeader>

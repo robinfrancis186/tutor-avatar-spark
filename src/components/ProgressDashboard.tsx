@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { star, clock } from 'lucide-react';
+import { Star, Clock, Book } from 'lucide-react';
 
 export const ProgressDashboard = () => {
   const progressData = [
@@ -25,7 +25,7 @@ export const ProgressDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-0 shadow-md">
           <CardContent className="p-4 text-center">
-            <clock className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+            <Clock className="w-8 h-8 mx-auto mb-2 text-blue-500" />
             <p className="text-2xl font-bold text-gray-800">{todayStats.timeSpent}</p>
             <p className="text-sm text-gray-600">Time Today</p>
           </CardContent>
@@ -33,7 +33,7 @@ export const ProgressDashboard = () => {
         
         <Card className="border-0 shadow-md">
           <CardContent className="p-4 text-center">
-            <book className="w-8 h-8 mx-auto mb-2 text-green-500" />
+            <Book className="w-8 h-8 mx-auto mb-2 text-green-500" />
             <p className="text-2xl font-bold text-gray-800">{todayStats.lessonsCompleted}</p>
             <p className="text-sm text-gray-600">Lessons Done</p>
           </CardContent>
@@ -41,7 +41,7 @@ export const ProgressDashboard = () => {
         
         <Card className="border-0 shadow-md">
           <CardContent className="p-4 text-center">
-            <star className="w-8 h-8 mx-auto mb-2 text-orange-500" />
+            <Star className="w-8 h-8 mx-auto mb-2 text-orange-500" />
             <p className="text-2xl font-bold text-gray-800">{todayStats.streak}</p>
             <p className="text-sm text-gray-600">Day Streak</p>
           </CardContent>
