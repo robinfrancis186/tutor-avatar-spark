@@ -1,11 +1,41 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { WelcomeSection } from '@/components/WelcomeSection';
+import { SubjectGrid } from '@/components/SubjectGrid';
+import { ProgressDashboard } from '@/components/ProgressDashboard';
+import { TutorChat } from '@/components/TutorChat';
+import { AchievementBadges } from '@/components/AchievementBadges';
 
 const Index = () => {
+  const [activeSection, setActiveSection] = useState('dashboard');
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
+  const handleSubjectSelect = (subject: string) => {
+    setSelectedSubject(subject);
+    setActiveSection('tutor');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="container mx-auto px-4 py-6">
+        <WelcomeSection />
+        
+        {activeSection === 'dashboard' && (
+          <div className="space-y-8 animate-fade-in">
+            <ProgressDashboard />
+            <SubjectGrid onSubjectSelect={handleSubjectSelect} />
+            <AchievementBadges />
+          </div>
+        )}
+
+        {activeSection === 'tutor' && selectedSubject && (
+          <div className="animate-fade-in">
+            <TutorChat 
+              subject={selectedSubject} 
+              onBack={() => setActiveSection('dashboard')}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
