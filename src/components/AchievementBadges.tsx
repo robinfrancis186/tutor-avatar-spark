@@ -5,8 +5,32 @@ import { Button } from '@/components/ui/button';
 import { Star, Gift, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+type EarnedAchievement = {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  earned: true;
+  date: string;
+  points: number;
+  rarity: string;
+};
+
+type UnearnedAchievement = {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  earned: false;
+  progress: string;
+  points: number;
+  rarity: string;
+};
+
+type Achievement = EarnedAchievement | UnearnedAchievement;
+
 export const AchievementBadges = () => {
-  const [achievements, setAchievements] = useState([
+  const [achievements, setAchievements] = useState<Achievement[]>([
     {
       id: 1,
       title: 'First Step',
@@ -87,7 +111,7 @@ export const AchievementBadges = () => {
   const simulateProgress = () => {
     setAchievements(prev => 
       prev.map(achievement => {
-        if (!achievement.earned && achievement.progress && Math.random() > 0.5) {
+        if (!achievement.earned && Math.random() > 0.5) {
           const [current, total] = achievement.progress.split('/').map(Number);
           const newCurrent = Math.min(total, current + 1);
           const newProgress = `${newCurrent}/${total}`;
@@ -99,7 +123,10 @@ export const AchievementBadges = () => {
             }, 1000);
           }
           
-          return { ...achievement, progress: newProgress };
+          return { 
+            ...achievement, 
+            progress: newProgress 
+          } as UnearnedAchievement;
         }
         return achievement;
       })
@@ -110,7 +137,16 @@ export const AchievementBadges = () => {
     setAchievements(prev => 
       prev.map(achievement => 
         achievement.id === id 
-          ? { ...achievement, earned: true, date: 'Just now!' }
+          ? { 
+              id: achievement.id,
+              title: achievement.title,
+              description: achievement.description,
+              icon: achievement.icon,
+              earned: true,
+              date: 'Just now!',
+              points: achievement.points,
+              rarity: achievement.rarity
+            } as EarnedAchievement
           : achievement
       )
     );
@@ -238,9 +274,7 @@ export const AchievementBadges = () => {
                         <div 
                           className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" 
                           style={{
-                            width: achievement.progress ? 
-                              `${(parseInt(achievement.progress.split('/')[0]) / parseInt(achievement.progress.split('/')[1])) * 100}%` : 
-                              '0%'
+                            width: `${(parseInt(achievement.progress.split('/')[0]) / parseInt(achievement.progress.split('/')[1])) * 100}%`
                           }}
                         ></div>
                       </div>
