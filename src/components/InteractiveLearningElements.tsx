@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { createVoiceSynthesis } from '@/utils/voiceSynthesis';
 import { Play, Pause, Volume2, VolumeX, Mic, MicOff, RotateCcw, Trophy, Star, Zap } from 'lucide-react';
+import { TactileFeedbackSystem } from './TactileFeedbackSystem';
+import { VirtualLabSimulations } from './VirtualLabSimulations';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Type declarations for Speech Recognition API
 declare global {
@@ -209,7 +212,7 @@ export const InteractiveLearningElements = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-xl text-gray-800">
               <Zap className="w-6 h-6 text-purple-500" />
-              Interactive Learning Playground
+              Enhanced Interactive Learning
             </CardTitle>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="flex items-center gap-1">
@@ -231,244 +234,288 @@ export const InteractiveLearningElements = () => {
             </div>
           </div>
           <p className="text-sm text-gray-600">
-            Voice-powered interactive learning with real-time feedback and encouragement
+            Advanced learning with tactile feedback, virtual labs, and voice-powered interactions
           </p>
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Button
-          variant={currentActivity === 'word-match' ? 'default' : 'outline'}
-          onClick={() => {
-            setCurrentActivity('word-match');
-            speak("Let's practice spelling! I'll say a word and you spell it.");
-          }}
-          className="hover-scale"
-        >
-          📝 Word Spelling
-        </Button>
-        <Button
-          variant={currentActivity === 'math' ? 'default' : 'outline'}
-          onClick={() => {
-            setCurrentActivity('math');
-            speak("Time for some math fun! Let's solve problems together.");
-          }}
-          className="hover-scale"
-        >
-          🧮 Math Puzzles
-        </Button>
-        <Button
-          variant={currentActivity === 'story' ? 'default' : 'outline'}
-          onClick={() => {
-            setCurrentActivity('story');
-            speak("Let's create an amazing story together!");
-          }}
-          className="hover-scale"
-        >
-          📚 Story Builder
-        </Button>
-      </div>
+      <Tabs defaultValue="activities" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="activities">Learning Activities</TabsTrigger>
+          <TabsTrigger value="haptic">Tactile Feedback</TabsTrigger>
+          <TabsTrigger value="lab">Virtual Lab</TabsTrigger>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="activities" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Button
+              variant={currentActivity === 'word-match' ? 'default' : 'outline'}
+              onClick={() => {
+                setCurrentActivity('word-match');
+                speak("Let's practice spelling! I'll say a word and you spell it.");
+              }}
+              className="hover-scale"
+            >
+              📝 Word Spelling
+            </Button>
+            <Button
+              variant={currentActivity === 'math' ? 'default' : 'outline'}
+              onClick={() => {
+                setCurrentActivity('math');
+                speak("Time for some math fun! Let's solve problems together.");
+              }}
+              className="hover-scale"
+            >
+              🧮 Math Puzzles
+            </Button>
+            <Button
+              variant={currentActivity === 'story' ? 'default' : 'outline'}
+              onClick={() => {
+                setCurrentActivity('story');
+                speak("Let's create an amazing story together!");
+              }}
+              className="hover-scale"
+            >
+              📚 Story Builder
+            </Button>
+          </div>
 
-      {currentActivity === 'word-match' && (
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">Word Spelling Challenge</CardTitle>
-            <p className="text-sm text-gray-600">Listen to the word and spell it correctly!</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <Button
-                onClick={() => speak(wordMatchGame.currentWord)}
-                className="hover-scale mb-4"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Hear the Word: "{wordMatchGame.currentWord}"
-              </Button>
-            </div>
-
-            <div className="flex gap-2">
-              <Input
-                placeholder="Type the word you heard..."
-                value={wordMatchGame.userInput}
-                onChange={(e) => setWordMatchGame(prev => ({ ...prev, userInput: e.target.value }))}
-                className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && checkWordMatch()}
-              />
-              <Button
-                onClick={startListening}
-                variant="outline"
-                disabled={isListening}
-                className="hover-scale"
-              >
-                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </Button>
-              <Button onClick={checkWordMatch} className="hover-scale">
-                Check
-              </Button>
-            </div>
-
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Attempts: {wordMatchGame.attempts}/3</span>
-              <span>Completed: {wordMatchGame.completed.length}/{wordMatchGame.words.length}</span>
-            </div>
-
-            <Progress value={(wordMatchGame.completed.length / wordMatchGame.words.length) * 100} />
-          </CardContent>
-        </Card>
-      )}
-
-      {currentActivity === 'math' && (
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">Math Problem Solver</CardTitle>
-            <p className="text-sm text-gray-600">Solve the equation and hear encouraging feedback!</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-4">{mathPuzzle.equation}</div>
-              <Button
-                onClick={() => speak(`The problem is: ${mathPuzzle.equation}`)}
-                variant="outline"
-                className="hover-scale mb-4"
-              >
-                <Volume2 className="w-4 h-4 mr-2" />
-                Hear the Problem
-              </Button>
-            </div>
-
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter your answer..."
-                value={mathPuzzle.userAnswer}
-                onChange={(e) => setMathPuzzle(prev => ({ ...prev, userAnswer: e.target.value }))}
-                type="number"
-                className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && checkMathAnswer()}
-              />
-              <Button
-                onClick={startListening}
-                variant="outline"
-                disabled={isListening}
-                className="hover-scale"
-              >
-                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </Button>
-              <Button onClick={checkMathAnswer} className="hover-scale">
-                Check
-              </Button>
-            </div>
-
-            <div className="flex gap-2">
-              <Button onClick={giveHint} variant="outline" className="hover-scale">
-                💡 Get Hint
-              </Button>
-              <Button 
-                onClick={() => {
-                  setMathPuzzle(prev => ({ ...prev, userAnswer: '', currentHint: 0 }));
-                  speak("Let's try this problem again!");
-                }}
-                variant="outline" 
-                className="hover-scale"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Try Again
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {currentActivity === 'story' && (
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">Collaborative Story Builder</CardTitle>
-            <p className="text-sm text-gray-600">Create an amazing story with voice input and suggestions!</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Story Starter:</h4>
-              <p className="text-blue-700">{storyBuilder.prompt}</p>
-              <Button
-                onClick={() => speak(storyBuilder.prompt)}
-                variant="outline"
-                size="sm"
-                className="mt-2 hover-scale"
-              >
-                <Volume2 className="w-3 h-3 mr-1" />
-                Hear Story Start
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="font-medium">Continue the story:</h4>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="What happens next in the story?"
-                  value={storyBuilder.userStory}
-                  onChange={(e) => setStoryBuilder(prev => ({ ...prev, userStory: e.target.value }))}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={startListening}
-                  variant="outline"
-                  disabled={isListening}
-                  className="hover-scale"
-                >
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="font-medium">Story suggestions:</h4>
-              <div className="flex flex-wrap gap-2">
-                {storyBuilder.suggestions.map((suggestion, index) => (
+          {currentActivity === 'word-match' && (
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">Word Spelling Challenge</CardTitle>
+                <p className="text-sm text-gray-600">Listen to the word and spell it correctly!</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
                   <Button
-                    key={index}
-                    onClick={() => addStorySuggestion(suggestion)}
+                    onClick={() => speak(wordMatchGame.currentWord)}
+                    className="hover-scale mb-4"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Hear the Word: "{wordMatchGame.currentWord}"
+                  </Button>
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type the word you heard..."
+                    value={wordMatchGame.userInput}
+                    onChange={(e) => setWordMatchGame(prev => ({ ...prev, userInput: e.target.value }))}
+                    className="flex-1"
+                    onKeyPress={(e) => e.key === 'Enter' && checkWordMatch()}
+                  />
+                  <Button
+                    onClick={startListening}
                     variant="outline"
-                    size="sm"
+                    disabled={isListening}
                     className="hover-scale"
                   >
-                    {suggestion}
+                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                   </Button>
-                ))}
-              </div>
-            </div>
+                  <Button onClick={checkWordMatch} className="hover-scale">
+                    Check
+                  </Button>
+                </div>
 
-            {storyBuilder.userStory && (
-              <div className="p-4 bg-green-50 rounded-lg">
-                <h4 className="font-medium text-green-800 mb-2">Your Story So Far:</h4>
-                <p className="text-green-700">{storyBuilder.prompt} {storyBuilder.userStory}</p>
-                <Button
-                  onClick={() => speak(storyBuilder.prompt + ' ' + storyBuilder.userStory)}
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 hover-scale"
-                >
-                  <Volume2 className="w-3 h-3 mr-1" />
-                  Hear Complete Story
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Attempts: {wordMatchGame.attempts}/3</span>
+                  <span>Completed: {wordMatchGame.completed.length}/{wordMatchGame.words.length}</span>
+                </div>
 
-      <Card className="border-0 shadow-md bg-gradient-to-r from-green-50 to-blue-50">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium text-gray-800">Today's Learning Progress</h3>
-              <p className="text-sm text-gray-600">Keep up the amazing work!</p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-green-600">{score}</div>
-              <p className="text-sm text-gray-600">Total Points</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                <Progress value={(wordMatchGame.completed.length / wordMatchGame.words.length) * 100} />
+              </CardContent>
+            </Card>
+          )}
+
+          {currentActivity === 'math' && (
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">Math Problem Solver</CardTitle>
+                <p className="text-sm text-gray-600">Solve the equation and hear encouraging feedback!</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 mb-4">{mathPuzzle.equation}</div>
+                  <Button
+                    onClick={() => speak(`The problem is: ${mathPuzzle.equation}`)}
+                    variant="outline"
+                    className="hover-scale mb-4"
+                  >
+                    <Volume2 className="w-4 h-4 mr-2" />
+                    Hear the Problem
+                  </Button>
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter your answer..."
+                    value={mathPuzzle.userAnswer}
+                    onChange={(e) => setMathPuzzle(prev => ({ ...prev, userAnswer: e.target.value }))}
+                    type="number"
+                    className="flex-1"
+                    onKeyPress={(e) => e.key === 'Enter' && checkMathAnswer()}
+                  />
+                  <Button
+                    onClick={startListening}
+                    variant="outline"
+                    disabled={isListening}
+                    className="hover-scale"
+                  >
+                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </Button>
+                  <Button onClick={checkMathAnswer} className="hover-scale">
+                    Check
+                  </Button>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={giveHint} variant="outline" className="hover-scale">
+                    💡 Get Hint
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setMathPuzzle(prev => ({ ...prev, userAnswer: '', currentHint: 0 }));
+                      speak("Let's try this problem again!");
+                    }}
+                    variant="outline" 
+                    className="hover-scale"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Try Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {currentActivity === 'story' && (
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">Collaborative Story Builder</CardTitle>
+                <p className="text-sm text-gray-600">Create an amazing story with voice input and suggestions!</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-blue-800 mb-2">Story Starter:</h4>
+                  <p className="text-blue-700">{storyBuilder.prompt}</p>
+                  <Button
+                    onClick={() => speak(storyBuilder.prompt)}
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 hover-scale"
+                  >
+                    <Volume2 className="w-3 h-3 mr-1" />
+                    Hear Story Start
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-medium">Continue the story:</h4>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="What happens next in the story?"
+                      value={storyBuilder.userStory}
+                      onChange={(e) => setStoryBuilder(prev => ({ ...prev, userStory: e.target.value }))}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={startListening}
+                      variant="outline"
+                      disabled={isListening}
+                      className="hover-scale"
+                    >
+                      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-medium">Story suggestions:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {storyBuilder.suggestions.map((suggestion, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => addStorySuggestion(suggestion)}
+                        variant="outline"
+                        size="sm"
+                        className="hover-scale"
+                      >
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {storyBuilder.userStory && (
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h4 className="font-medium text-green-800 mb-2">Your Story So Far:</h4>
+                    <p className="text-green-700">{storyBuilder.prompt} {storyBuilder.userStory}</p>
+                    <Button
+                      onClick={() => speak(storyBuilder.prompt + ' ' + storyBuilder.userStory)}
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 hover-scale"
+                    >
+                      <Volume2 className="w-3 h-3 mr-1" />
+                      Hear Complete Story
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="haptic" className="mt-6">
+          <TactileFeedbackSystem />
+        </TabsContent>
+
+        <TabsContent value="lab" className="mt-6">
+          <VirtualLabSimulations />
+        </TabsContent>
+
+        <TabsContent value="progress" className="mt-6">
+          <Card className="border-0 shadow-md bg-gradient-to-r from-green-50 to-blue-50">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">{score}</div>
+                  <p className="text-sm text-gray-600">Total Points</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600">{streak}</div>
+                  <p className="text-sm text-gray-600">Current Streak</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-600">
+                    {Math.floor((score / 100) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600">Learning Progress</p>
+                </div>
+              </div>
+              <div className="mt-6">
+                <h3 className="font-medium text-gray-800 mb-3">Today's Achievements</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    🎯 Spelling Master
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    🧮 Math Genius
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    📚 Story Creator
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    🔬 Lab Explorer
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
