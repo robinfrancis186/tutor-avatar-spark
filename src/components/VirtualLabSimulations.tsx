@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { 
-  Flask, 
+  TestTube, 
   Beaker, 
   Microscope, 
   Atom, 
@@ -266,7 +265,7 @@ export const VirtualLabSimulations = () => {
       <Card className="border-0 shadow-md bg-gradient-to-r from-blue-50 to-green-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl text-gray-800">
-            <Flask className="w-6 h-6 text-blue-500" />
+            <TestTube className="w-6 h-6 text-blue-500" />
             Virtual Laboratory Simulations
           </CardTitle>
           <p className="text-sm text-gray-600">
