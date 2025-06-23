@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,31 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { createVoiceSynthesis } from '@/utils/voiceSynthesis';
 import { Play, Pause, Volume2, VolumeX, Mic, MicOff, RotateCcw, Trophy, Star, Zap } from 'lucide-react';
+
+// Type declarations for Speech Recognition API
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognitionEvent {
+  results: {
+    [key: number]: {
+      [key: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionInstance {
+  onstart: () => void;
+  onend: () => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  start: () => void;
+}
 
 export const InteractiveLearningElements = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
@@ -53,13 +77,13 @@ export const InteractiveLearningElements = () => {
 
   const startListening = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      const recognition = new SpeechRecognition();
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const recognition: SpeechRecognitionInstance = new SpeechRecognition();
       
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
       
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript.toLowerCase();
         handleVoiceInput(transcript);
       };
