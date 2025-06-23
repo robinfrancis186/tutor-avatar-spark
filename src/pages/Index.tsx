@@ -6,8 +6,11 @@ import { ProgressDashboard } from '@/components/ProgressDashboard';
 import { TutorChat } from '@/components/TutorChat';
 import { AchievementBadges } from '@/components/AchievementBadges';
 import { AccessibilitySettings } from '@/components/AccessibilitySettings';
+import { EnhancedAccessibilitySettings } from '@/components/EnhancedAccessibilitySettings';
 import { CaregiverDashboard } from '@/components/CaregiverDashboard';
 import { AdaptiveLearningEngine } from '@/components/AdaptiveLearningEngine';
+import { EnhancedAnalytics } from '@/components/EnhancedAnalytics';
+import { InteractiveLearningElements } from '@/components/InteractiveLearningElements';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -28,9 +31,10 @@ const Index = () => {
         {activeSection === 'dashboard' && (
           <div className="space-y-8 animate-fade-in">
             <Tabs defaultValue="learning" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="learning">Learning</TabsTrigger>
-                <TabsTrigger value="progress">Progress</TabsTrigger>
+                <TabsTrigger value="interactive">Interactive</TabsTrigger>
+                <TabsTrigger value="progress">Analytics</TabsTrigger>
                 <TabsTrigger value="adaptive">AI Engine</TabsTrigger>
                 <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
                 <TabsTrigger value="caregiver">Caregiver</TabsTrigger>
@@ -41,10 +45,13 @@ const Index = () => {
                 <SubjectGrid onSubjectSelect={handleSubjectSelect} />
                 <AchievementBadges />
               </TabsContent>
+
+              <TabsContent value="interactive" className="space-y-8 mt-6">
+                <InteractiveLearningElements />
+              </TabsContent>
               
               <TabsContent value="progress" className="space-y-8 mt-6">
-                <ProgressDashboard />
-                <AchievementBadges />
+                <EnhancedAnalytics />
               </TabsContent>
               
               <TabsContent value="adaptive" className="space-y-8 mt-6">
@@ -52,7 +59,7 @@ const Index = () => {
               </TabsContent>
               
               <TabsContent value="accessibility" className="space-y-8 mt-6">
-                <AccessibilitySettings />
+                <EnhancedAccessibilitySettings />
               </TabsContent>
               
               <TabsContent value="caregiver" className="space-y-8 mt-6">
