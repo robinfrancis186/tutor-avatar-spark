@@ -11,6 +11,7 @@ import { CaregiverDashboard } from '@/components/CaregiverDashboard';
 import { AdaptiveLearningEngine } from '@/components/AdaptiveLearningEngine';
 import { EnhancedAnalytics } from '@/components/EnhancedAnalytics';
 import { InteractiveLearningElements } from '@/components/InteractiveLearningElements';
+import { AiTutorAvatar } from '@/components/AiTutorAvatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -23,9 +24,20 @@ const Index = () => {
     setActiveSection('tutor');
   };
 
+  const handleAvatarInteraction = (message: string) => {
+    console.log('AI Tutor says:', message);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-4 py-6">
+      {/* AI Tutor Avatar - Fixed positioned on the left */}
+      <AiTutorAvatar 
+        currentSubject={selectedSubject || 'general learning'}
+        studentName="Alex"
+        onInteraction={handleAvatarInteraction}
+      />
+
+      <div className="container mx-auto px-4 py-6 ml-16"> {/* Added left margin to accommodate avatar */}
         <WelcomeSection />
         
         {activeSection === 'dashboard' && (
