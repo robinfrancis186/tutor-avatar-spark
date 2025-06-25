@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MessageCircle, Volume2, VolumeX, Sparkles, Heart, Star } from 'lucide-react';
+import { MessageCircle, Volume2, VolumeX, Sparkles, Heart, Star, Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { createVoiceSynthesis } from '@/utils/voiceSynthesis';
+import { OpenVoiceService } from '@/utils/openVoiceService';
 
 interface AiTutorAvatarProps {
   currentSubject?: string;
@@ -26,7 +25,9 @@ const avatarExpressions = {
   thinking: "🤔",
   celebrating: "🎉",
   encouraging: "💪",
-  wise: "🧠"
+  wise: "🧠",
+  listening: "👂",
+  speaking: "🗣️"
 };
 
 export const AiTutorAvatar = ({ 
@@ -36,9 +37,11 @@ export const AiTutorAvatar = ({
 }: AiTutorAvatarProps) => {
   const [currentExpression, setCurrentExpression] = useState<keyof typeof avatarExpressions>('happy');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [messages, setMessages] = useState<TutorMessage[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [voiceSynthesis] = useState(() => createVoiceSynthesis());
+  const [voiceService] = useState(() => new OpenVoiceService());
   const { toast } = useToast();
 
   const encouragementMessages = [
@@ -106,21 +109,30 @@ export const AiTutorAvatar = ({
   };
 
   const speakMessage = async (text: string) => {
-    if (soundEnabled) {
+    if (soundEnabled && voiceService) {
       try {
+        setIsSpeaking(true);
+        setCurrentExpression('speaking');
         const cleanText = text.replace(/[🎉🌟💫✨🚀🌱💡🎯📚🧩⭐🏆🎊🌅⚡🌙😊🤩🤔💪🧠]/g, '');
-        await voiceSynthesis.speak(cleanText);
+        await voiceService.speak(cleanText);
       } catch (error) {
-        console.log('Voice synthesis not available');
+        console.log('OpenVoice synthesis not available, falling back to browser TTS');
+        // Fallback to browser TTS
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.speak(utterance);
+      } finally {
+        setIsSpeaking(false);
+        setCurrentExpression('happy');
       }
     }
   };
 
   const addMessage = (message: TutorMessage) => {
-    setMessages(prev => [message, ...prev.slice(0, 4)]); // Keep only last 5 messages
+    setMessages(prev => [message, ...prev.slice(0, 4)]);
     speakMessage(message.text);
     
-    // Set appropriate expression based on message type
     const expressionMap: Record<TutorMessage['type'], keyof typeof avatarExpressions> = {
       encouragement: 'encouraging',
       tip: 'wise',
@@ -142,20 +154,18 @@ export const AiTutorAvatar = ({
     addMessage(message);
     
     toast({
-      title: "AI Tutor says:",
+      title: "AI Tutor Luna says:",
       description: message.text,
       duration: 3000,
     });
   };
 
-  // Automatic encouraging messages
   useEffect(() => {
     const interval = setInterval(() => {
       const message = generateContextualMessage();
       addMessage(message);
-    }, 60000); // Every minute
+    }, 60000);
 
-    // Initial greeting
     setTimeout(() => {
       const greeting: TutorMessage = {
         id: Date.now(),
@@ -169,10 +179,9 @@ export const AiTutorAvatar = ({
     return () => clearInterval(interval);
   }, [studentName, currentSubject]);
 
-  // Expression cycling for liveliness
   useEffect(() => {
     const expressionCycle = setInterval(() => {
-      if (!isAnimating) {
+      if (!isAnimating && !isSpeaking) {
         const expressions = Object.keys(avatarExpressions) as Array<keyof typeof avatarExpressions>;
         const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
         setCurrentExpression(randomExpression);
@@ -180,70 +189,108 @@ export const AiTutorAvatar = ({
     }, 8000);
 
     return () => clearInterval(expressionCycle);
-  }, [isAnimating]);
+  }, [isAnimating, isSpeaking]);
 
   return (
     <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-50 space-y-4">
-      {/* Avatar Card */}
-      <Card className="bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300">
-        <CardContent className="p-4 text-center">
+      {/* Enhanced Avatar Card with improved gradients and animations */}
+      <Card className="bg-gradient-to-br from-purple-100 via-blue-100 to-indigo-100 border-2 border-purple-300 shadow-2xl hover:shadow-3xl transition-all duration-500 backdrop-blur-sm">
+        <CardContent className="p-6 text-center relative overflow-hidden">
+          {/* Animated background particles */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-2 left-2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+            <div className="absolute top-8 right-3 w-1 h-1 bg-pink-400 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
+          </div>
+          
           <div 
-            className={`cursor-pointer transition-transform duration-300 ${
-              isAnimating ? 'animate-bounce' : 'hover:scale-110'
+            className={`cursor-pointer transition-all duration-500 ${
+              isAnimating || isSpeaking 
+                ? 'animate-bounce scale-110' 
+                : 'hover:scale-110 hover:rotate-3'
             }`}
             onClick={handleAvatarClick}
           >
-            <Avatar className="w-20 h-20 mx-auto mb-3 ring-4 ring-purple-300 ring-opacity-50">
-              <AvatarImage src="/placeholder.svg?height=80&width=80" alt="AI Tutor" />
-              <AvatarFallback className="bg-gradient-to-br from-purple-400 to-blue-400 text-white text-2xl">
+            <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-purple-400 ring-opacity-60 shadow-lg transition-all duration-300">
+              <AvatarImage src="/placeholder.svg?height=96&width=96" alt="AI Tutor Luna" />
+              <AvatarFallback className={`bg-gradient-to-br from-purple-500 to-blue-500 text-white text-3xl transition-all duration-300 ${
+                isSpeaking ? 'animate-pulse bg-gradient-to-br from-green-500 to-blue-500' : ''
+              }`}>
                 {avatarExpressions[currentExpression]}
               </AvatarFallback>
             </Avatar>
           </div>
           
-          <h3 className="font-bold text-purple-800 mb-1">AI Tutor Luna</h3>
-          <p className="text-xs text-purple-600 mb-3">Your Learning Companion</p>
+          <h3 className="font-bold text-purple-800 mb-1 text-lg">AI Tutor Luna</h3>
+          <p className="text-xs text-purple-600 mb-4 font-medium">Your Learning Companion</p>
+          
+          {/* Status indicator */}
+          <div className="flex justify-center mb-3">
+            {isSpeaking && (
+              <div className="flex items-center space-x-1 text-xs text-green-600 font-medium">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Speaking...</span>
+              </div>
+            )}
+            {isListening && (
+              <div className="flex items-center space-x-1 text-xs text-blue-600 font-medium">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                <span>Listening...</span>
+              </div>
+            )}
+          </div>
           
           <div className="flex justify-center space-x-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="hover-scale"
+              className="hover-scale border-purple-300 hover:bg-purple-50 transition-all duration-200"
             >
-              {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+              {soundEnabled ? 
+                <Volume2 className="w-3 h-3 text-purple-600" /> : 
+                <VolumeX className="w-3 h-3 text-gray-500" />
+              }
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleAvatarClick}
-              className="hover-scale"
+              className="hover-scale border-purple-300 hover:bg-purple-50 transition-all duration-200"
             >
-              <MessageCircle className="w-3 h-3" />
+              <MessageCircle className="w-3 h-3 text-purple-600" />
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Recent Messages */}
+      {/* Enhanced Recent Messages with better styling */}
       {messages.length > 0 && (
-        <Card className="bg-white/90 backdrop-blur-sm border border-purple-200 shadow-md max-w-xs">
-          <CardContent className="p-3">
-            <div className="space-y-2">
-              {messages.slice(0, 2).map((message) => (
+        <Card className="bg-white/95 backdrop-blur-md border border-purple-200 shadow-xl max-w-xs transition-all duration-300 hover:shadow-2xl">
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              {messages.slice(0, 2).map((message, index) => (
                 <div
                   key={message.id}
-                  className="text-xs p-2 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 animate-fade-in"
+                  className={`text-xs p-3 rounded-xl bg-gradient-to-r border transition-all duration-300 hover:scale-105 ${
+                    index === 0 
+                      ? 'from-purple-50 via-blue-50 to-indigo-50 border-purple-200 shadow-md' 
+                      : 'from-purple-25 via-blue-25 to-indigo-25 border-purple-100 opacity-75'
+                  } animate-fade-in`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-start gap-2">
-                    <div className="text-lg">
+                    <div className="text-lg flex-shrink-0">
                       {message.type === 'celebration' && '🎉'}
                       {message.type === 'encouragement' && '💪'}
                       {message.type === 'tip' && '💡'}
                       {message.type === 'greeting' && '👋'}
                       {message.type === 'reminder' && '⏰'}
                     </div>
-                    <p className="text-purple-800 leading-relaxed">{message.text}</p>
+                    <p className="text-purple-800 leading-relaxed font-medium">{message.text}</p>
+                  </div>
+                  <div className="text-xs text-purple-500 mt-2 text-right opacity-60">
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
               ))}
@@ -252,15 +299,21 @@ export const AiTutorAvatar = ({
         </Card>
       )}
 
-      {/* Floating Particles for Extra Liveliness */}
-      <div className="absolute -top-2 -right-2 pointer-events-none">
-        <Sparkles className={`w-6 h-6 text-yellow-400 ${isAnimating ? 'animate-spin' : 'animate-pulse'}`} />
+      {/* Enhanced Floating Particles */}
+      <div className="absolute -top-4 -right-4 pointer-events-none">
+        <Sparkles className={`w-8 h-8 text-yellow-400 drop-shadow-lg ${
+          isAnimating ? 'animate-spin' : 'animate-pulse'
+        }`} />
       </div>
-      <div className="absolute -bottom-2 -left-2 pointer-events-none">
-        <Star className={`w-4 h-4 text-purple-400 ${isAnimating ? 'animate-bounce' : 'animate-pulse'}`} />
+      <div className="absolute -bottom-4 -left-4 pointer-events-none">
+        <Star className={`w-6 h-6 text-purple-400 drop-shadow-lg ${
+          isAnimating ? 'animate-bounce' : 'animate-pulse'
+        }`} />
       </div>
-      <div className="absolute top-1/2 -right-4 pointer-events-none">
-        <Heart className={`w-3 h-3 text-pink-400 ${isAnimating ? 'animate-ping' : 'animate-pulse'}`} />
+      <div className="absolute top-1/2 -right-6 pointer-events-none">
+        <Heart className={`w-4 h-4 text-pink-400 drop-shadow-lg ${
+          isAnimating ? 'animate-ping' : 'animate-pulse'
+        }`} />
       </div>
     </div>
   );

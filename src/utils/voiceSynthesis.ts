@@ -10,7 +10,7 @@ export class VoiceSynthesis {
   private synth: SpeechSynthesis;
   private settings: VoiceSettings;
 
-  constructor(settings: VoiceSettings = { rate: 1, pitch: 1, volume: 0.8 }) {
+  constructor(settings: VoiceSettings = { rate: 0.9, pitch: 1.1, volume: 0.8 }) {
     this.synth = window.speechSynthesis;
     this.settings = settings;
   }
@@ -22,13 +22,24 @@ export class VoiceSynthesis {
         return;
       }
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      // Clean text for better pronunciation
+      const cleanText = text.replace(/[🎉🌟💫✨🚀🌱💡🎯📚🧩⭐🏆🎊🌅⚡🌙😊🤩🤔💪🧠]/g, '');
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = this.settings.rate;
       utterance.pitch = this.settings.pitch;
       utterance.volume = this.settings.volume;
       
-      if (this.settings.voice) {
-        utterance.voice = this.settings.voice;
+      // Try to use a more natural voice
+      const voices = this.synth.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.name.includes('Google') || 
+        voice.name.includes('Natural') ||
+        voice.name.includes('Premium')
+      ) || voices.find(voice => voice.lang.startsWith('en'));
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
       }
 
       utterance.onend = () => resolve();
